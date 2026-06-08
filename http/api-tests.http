@@ -1,0 +1,226 @@
+### Sample data
+GET http://localhost:8080/data/sample
+
+
+### Create first data
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "alma",
+  "value": 10
+}
+
+
+### Create second data
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "korte",
+  "value": 20
+}
+
+
+### Get all data
+GET http://localhost:8080/data
+
+### Get data by valid id
+GET http://localhost:8080/data/1
+
+### Get data by invalid id
+GET http://localhost:8080/data/11
+
+### Create invalid data - empty name
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "",
+  "value": 10
+}
+
+
+### Create invalid data - negative value
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "alma",
+  "value": -5
+}
+
+### Create invalid data
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "",
+  "value": -5
+}
+
+
+### Get stats
+GET http://localhost:8080/data/stats
+
+### Create data
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "alma",
+  "value": 10
+}
+
+
+### Update data
+PUT http://localhost:8080/data/1
+Content-Type: application/json
+
+{
+  "name": "alma updated",
+  "value": 99
+}
+
+
+### Get updated data
+GET http://localhost:8080/data/1
+
+### Create data
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "delete test",
+  "value": 50
+}
+
+
+### Delete data
+DELETE http://localhost:8080/data/1
+
+
+### Verify deletion
+GET http://localhost:8080/data/1
+
+### Get all data
+GET http://localhost:8080/data
+
+### Get data min value
+GET http://localhost:8080/data?minValue=50
+
+### Get data min, max value
+GET http://localhost:8080/data?minValue=10&maxValue=100
+
+### Get data min, max value, sort, direction and page size
+GET http://localhost:8080/data?page=0&size=5&sort=value,desc
+###GET http://localhost:8080/data?page=0&size=5&sortBy=value&sortDirection=desc
+
+### Get data min, max value, sort for more field, direction and page size
+GET http://localhost:8080/data?page=0&size=5&sort=value,desc&sort=name,asc
+
+### Post filtering:  data min, max value
+POST http://localhost:8080/data/search?page=0&size=5&sort=value,desc
+Content-Type: application/json
+
+{
+  "minValue": 10,
+  "maxValue": 100
+}
+
+### Get data min, max value, sort for more field, direction and page size
+GET http://localhost:8080/data?name=app
+
+### Get data min, max value, sort for more field, direction and page size
+GET http://localhost:8080/data?name=app&minValue=10
+
+### Get data min, max value, sort for more field, direction and page size
+GET http://localhost:8080/data?name=app&minValue=10&maxValue=100
+
+### Post filtering:  data min, max value, name
+POST http://localhost:8080/data/search?page=0&size=5&sort=value,desc
+Content-Type: application/json
+
+{
+  "name" : "apple",
+  "minValue": 10,
+  "maxValue": 100
+}
+
+### Get data unknownField ->error
+GET http://localhost:8080/data?sort=unknownField,desc
+
+### Get data pageSize ->error
+GET http://localhost:8080/data?size=1000
+
+
+### Create data with category 1
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "Temperature",
+  "value": 25,
+  "categoryId": 1
+}
+
+### Create data with category 2
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "Humidity",
+  "value": 60,
+  "categoryId": 2
+}
+
+
+### Create category Sensors
+POST http://localhost:8080/categories
+Content-Type: application/json
+
+{
+"name": "Sensors"
+}
+
+### Create data with category 1
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+"name": "Temperature",
+"value": 25,
+"categoryId": 1
+}
+
+### Create tag
+POST http://localhost:8080/tags
+Content-Type: application/json
+
+{
+  "name": "urgent"
+}
+
+### Create tag
+POST http://localhost:8080/tags
+Content-Type: application/json
+
+{
+  "name": "weather"
+}
+
+
+### Create data
+POST http://localhost:8080/data
+Content-Type: application/json
+
+{
+  "name": "Temperature",
+  "value": 25,
+  "categoryId": 1,
+  "tagIds": [1, 2]
+}
+
+
+### Get data
+GET http://localhost:8080/data
