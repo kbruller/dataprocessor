@@ -39,6 +39,7 @@ public class DataEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @Builder.Default
     private Set<DataTagEntity> dataTags = new HashSet<>();
 
 

@@ -3,21 +3,15 @@ package com.example.dataprocessor.mapper;
 import com.example.dataprocessor.entity.TagEntity;
 import com.example.dataprocessor.model.dto.TagRequest;
 import com.example.dataprocessor.model.dto.TagResponse;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class TagMapper {
+@Mapper(componentModel = "spring")
+public interface TagMapper {
 
-    public TagEntity toEntity(TagRequest request) {
-        return TagEntity.builder()
-                .name(request.name())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dataTags", ignore = true)
+    TagEntity toEntity(TagRequest request);
 
-    public TagResponse toResponse(TagEntity entity) {
-        return new TagResponse(
-                entity.getId(),
-                entity.getName()
-        );
-    }
+    TagResponse toResponse(TagEntity entity);
 }

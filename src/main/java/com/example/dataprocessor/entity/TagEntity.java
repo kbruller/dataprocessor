@@ -12,8 +12,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // <- for JPA a  protected!
+@AllArgsConstructor(access = AccessLevel.PRIVATE)  // <- no acces from outside
 public class TagEntity {
 
     @Id
@@ -22,11 +22,8 @@ public class TagEntity {
 
     private String name;
 
-    public TagEntity(String name) {
-        this.name = name;
-    }
-
     @OneToMany(mappedBy = "tag")
+    @Builder.Default
     private Set<DataTagEntity> dataTags = new HashSet<>();
 
 }

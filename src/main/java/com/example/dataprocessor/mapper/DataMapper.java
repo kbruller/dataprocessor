@@ -1,45 +1,35 @@
 package com.example.dataprocessor.mapper;
 
 import com.example.dataprocessor.entity.DataEntity;
+import com.example.dataprocessor.entity.DataTagEntity;
 import com.example.dataprocessor.model.dto.DataRequest;
 import com.example.dataprocessor.model.dto.DataResponse;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
-public class DataMapper {
+@Mapper(componentModel = "spring")
+public interface DataMapper {
 
-    public DataEntity toEntity(DataRequest request) {
-        return new DataEntity(
-                request.name(),
-                request.value()
-        );
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "dataTags", ignore = true)
+    DataEntity toEntity(DataRequest request);
 
-    public DataResponse toResponse(DataEntity entity) {
+    @Mapping(source = "category.id", target = "categoryId")
+    @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(source = "dataTags", target = "tags")
+    DataResponse toResponse(DataEntity entity);
 
-        Long categoryId = null;
-        String categoryName = null;
-
-        if (entity.getCategory() != null) {
-            categoryId = entity.getCategory().getId();
-            categoryName = entity.getCategory().getName();
+    default Set<String> mapDataTagsToTagNames(Set<DataTagEntity> dataTags) {
+        if (dataTags == null) {
+            return Set.of();
         }
 
-        Set<String> tags = entity.getDataTags()
-                .stream()
+        return dataTags.stream()
                 .map(dataTag -> dataTag.getTag().getName())
                 .collect(Collectors.toSet());
-
-        return new DataResponse(
-                entity.getId(),
-                entity.getName(),
-                entity.getValue(),
-                categoryId,
-                categoryName,
-                tags
-        );
     }
 }

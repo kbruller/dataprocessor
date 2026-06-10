@@ -3,19 +3,14 @@ package com.example.dataprocessor.mapper;
 import com.example.dataprocessor.entity.CategoryEntity;
 import com.example.dataprocessor.model.dto.CategoryRequest;
 import com.example.dataprocessor.model.dto.CategoryResponse;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class CategoryMapper {
+@Mapper(componentModel = "spring")
+public interface CategoryMapper {
 
-    public CategoryEntity toEntity(CategoryRequest request) {
-        return new CategoryEntity(request.name());
-    }
+    @Mapping(target = "id", ignore = true)
+    CategoryEntity toEntity(CategoryRequest request);
 
-    public CategoryResponse toResponse(CategoryEntity entity) {
-        return new CategoryResponse(
-                entity.getId(),
-                entity.getName()
-        );
-    }
+    CategoryResponse toResponse(CategoryEntity entity);
 }
