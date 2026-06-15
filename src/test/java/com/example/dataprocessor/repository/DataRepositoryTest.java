@@ -4,43 +4,22 @@ import com.example.dataprocessor.entity.CategoryEntity;
 import com.example.dataprocessor.entity.DataEntity;
 import com.example.dataprocessor.entity.DataTagEntity;
 import com.example.dataprocessor.entity.TagEntity;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class DataRepositoryTest {
-    @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
-    private DataRepository dataRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
-    private TagRepository tagRepository;
+class DataRepositoryTest extends BaseJpaIntegrationTest {
 
     @Test
     void shouldSaveAndFindDataEntity() {
-        DataEntity entity = DataEntity.builder()
-                .name("Temperature")
-                .value(25.0)
-                .build();
+        DataEntity savedData = createAndSaveData("Temperature", 25.0);
 
-        DataEntity saved = dataRepository.save(entity);
+        flushAndClear();
 
-        // ---------------------
-        entityManager.flush(); // We force Hibernate to write the SQL to the database
-        entityManager.clear(); // We completely clear Hibernate's internal memory (cache)
-        // ---------------------
+        assertThat(savedData.getId()).isNotNull();
 
-        assertThat(saved.getId()).isNotNull();
-
-        DataEntity found = dataRepository.findById(saved.getId())
+        DataEntity found = dataRepository.findById(savedData.getId())
                 .orElseThrow();
 
         assertThat(found.getName()).isEqualTo("Temperature");
@@ -49,28 +28,13 @@ class DataRepositoryTest {
 
     @Test
     void shouldPersistCategoryRelationship() {
+        CategoryEntity category = createAndSaveCategory("Sensors");
+        DataEntity savedData = createAndSaveData("Temperature", 25.0);
+        savedData.setCategory(category);
 
-        CategoryEntity category = CategoryEntity.builder()
-                .name("Sensors")
-                .build();
+        flushAndClear();
 
-        category = categoryRepository.save(category);
-
-        DataEntity data = DataEntity.builder()
-                .name("Temperature")
-                .value(25.0)
-                .build();
-
-        data.setCategory(category);
-
-        DataEntity saved = dataRepository.save(data);
-
-        // ---------------------
-        entityManager.flush(); // We force Hibernate to write the SQL to the database
-        entityManager.clear(); // We completely clear Hibernate's internal memory (cache)
-        // ---------------------
-
-        DataEntity found = dataRepository.findById(saved.getId())
+        DataEntity found = dataRepository.findById(savedData.getId())
                 .orElseThrow();
 
         assertThat(found.getCategory()).isNotNull();
@@ -84,28 +48,13 @@ class DataRepositoryTest {
 
     @Test
     void shouldPersistTagRelationshipThroughAssociationEntity() {
+        TagEntity savedTag = createAndSaveTag("urgent");
+        DataEntity savedData = createAndSaveData("Temperature", 25.0);
+        savedData.addTag(savedTag, "MANUAL");
 
-        TagEntity tag = TagEntity.builder()
-                .name("urgent")
-                .build();
+        flushAndClear();
 
-        TagEntity savedTag = tagRepository.save(tag);
-
-        DataEntity data = DataEntity.builder()
-                .name("Temperature")
-                .value(25.0)
-                .build();
-
-        data.addTag(tag, "MANUAL");
-
-        DataEntity saved = dataRepository.save(data);
-
-        // ---------------------
-        entityManager.flush(); // We force Hibernate to write the SQL to the database
-        entityManager.clear(); // We completely clear Hibernate's internal memory (cache)
-        //
-
-        DataEntity found = dataRepository.findById(saved.getId())
+        DataEntity found = dataRepository.findById(savedData.getId())
                 .orElseThrow();
 
         assertThat(found.getDataTags()).hasSize(1);
@@ -129,7 +78,7 @@ class DataRepositoryTest {
                 });
 
         assertThat(dataTag.getTag().getId())
-                .isEqualTo(tag.getId());
+                .isEqualTo(savedTag.getId());
 
         assertThat(dataTag.getTag().getName())
                 .isEqualTo("urgent");
