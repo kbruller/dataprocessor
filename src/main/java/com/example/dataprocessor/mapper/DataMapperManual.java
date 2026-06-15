@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 public class DataMapperManual {
 
     public DataEntity toEntity(DataRequest request) {
-        return new DataEntity(
-                request.name(),
-                request.value()
-        );
+        return DataEntity.builder()
+                .name(request.name())
+                .value(request.value())
+                .build();
     }
 
     public DataResponse toResponse(DataEntity entity) {

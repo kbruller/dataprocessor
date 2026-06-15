@@ -29,11 +29,6 @@ public class DataEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private CategoryEntity category;
 
-    public DataEntity(String name, double value) {
-        this.name = name;
-        this.value = value;
-    }
-
     @OneToMany(
             mappedBy = "data",
             cascade = CascadeType.ALL,
@@ -42,6 +37,12 @@ public class DataEntity {
     @Builder.Default
     private Set<DataTagEntity> dataTags = new HashSet<>();
 
+    public Set<DataTagEntity> getDataTags() {
+        if (this.dataTags == null) {
+            this.dataTags = new HashSet<>();
+        }
+        return this.dataTags;
+    }
 
     public void addTag(TagEntity tag, String source) {
         DataTagEntity dataTag = DataTagEntity.builder()

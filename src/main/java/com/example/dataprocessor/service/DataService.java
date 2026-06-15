@@ -14,7 +14,6 @@ import com.example.dataprocessor.repository.DataRepository;
 import com.example.dataprocessor.repository.TagRepository;
 import com.example.dataprocessor.specification.DataSpecification;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class DataService {
@@ -93,9 +91,6 @@ public class DataService {
     public DataResponse updateData(Long id, DataRequest request) {
         DataEntity entity = dataRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException(id));
-
-        System.out.println(
-                entity.getCategory().getClass());
 
         entity.setName(request.name());
         entity.setValue(request.value());
