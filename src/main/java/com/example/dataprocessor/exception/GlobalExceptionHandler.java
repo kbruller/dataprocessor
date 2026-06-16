@@ -15,23 +15,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TagInUseException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiErrorResponse handleTagInUse(TagInUseException ex) {
-        return new ApiErrorResponse(
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                ex.getMessage(),
-                null
-        );
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(DataNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiErrorResponse handleDataNotFound( DataNotFoundException exception ){
-        return new ApiErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                exception.getMessage(),
-                null
-        );
+    public ApiErrorResponse handleDataNotFound(DataNotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidSortFieldException.class)
@@ -39,12 +29,7 @@ public class GlobalExceptionHandler {
     public ApiErrorResponse handleInvalidSortField(
             InvalidSortFieldException ex
     ) {
-        return new ApiErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage(),
-                null
-        );
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidPageSizeException.class)
@@ -52,35 +37,19 @@ public class GlobalExceptionHandler {
     public ApiErrorResponse handleInvalidPageSize(
             InvalidPageSizeException ex
     ) {
-        return new ApiErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage(),
-                null
-        );
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
-
 
     @ExceptionHandler(CategoryNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiErrorResponse handleCategoryNotFound(CategoryNotFoundException ex) {
-        return new ApiErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage(),
-                null
-        );
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(CategoryInUseException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiErrorResponse handleCategoryInUse(CategoryInUseException ex) {
-        return new ApiErrorResponse(
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                ex.getMessage(),
-                null
-        );
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(TagNotFoundException.class)
@@ -88,10 +57,14 @@ public class GlobalExceptionHandler {
     public ApiErrorResponse handleTagNotFound(
             TagNotFoundException ex
     ) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    private ApiErrorResponse buildErrorResponse(HttpStatus status, String message) {
         return new ApiErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage(),
+                status.value(),
+                status.getReasonPhrase(),
+                message,
                 null
         );
     }
@@ -112,6 +85,18 @@ public class GlobalExceptionHandler {
                 "Validation Failed",
                 "Request validation failed",
                 errors
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrorResponse handleGeneralException(Exception ex) {
+        // log.error("An unexpected internal server error occurred.", ex)
+        return new ApiErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "An unexpected internal server error occurred.",
+                null
         );
     }
 }

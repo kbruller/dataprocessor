@@ -12,12 +12,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping("/data")
+@RequestMapping(value = "/data", produces = APPLICATION_JSON_VALUE)
 public class DataController {
 
     private final DataService dataService;
@@ -26,14 +24,38 @@ public class DataController {
         this.dataService = dataService;
     }
 
-    @GetMapping("/sample")
-    public DataResponse sample() {
-        return new DataResponse(0L, "test", 42.0, 1L, "Test_category", Set.of("urgent", "weather"));
-    }
-
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public DataResponse create(@Valid @RequestBody DataRequest request) {
         return dataService.createData(request);
+    }
+
+    @GetMapping
+    public Page<DataResponse> getData(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Double minValue,
+            @RequestParam(required = false) Double maxValue,
+            @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return dataService.search(name, minValue, maxValue, pageable);
+    }
+
+    @GetMapping("/{id}")
+    public DataResponse getById(@PathVariable Long id) {
+        return dataService.getById(id);
+    }
+
+    @PostMapping("/search")
+    public Page<DataResponse> searchData(
+            @RequestBody DataSearchRequest request,
+            @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return dataService.search(request, pageable);
+    }
+
+    @GetMapping("/stats")
+    public StatsResponse getStats() {
+        return dataService.getStats();
     }
 
     @PutMapping("/{id}")
@@ -50,63 +72,8 @@ public class DataController {
         dataService.deleteData(id);
     }
 
-//    @GetMapping
-//    public Page<DataResponse> getData(
-//            @RequestParam(required = false) Double minValue,
-//            @RequestParam(required = false) Double maxValue,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "5") int size,
-//            @RequestParam(defaultValue = "id") String sortBy,
-//            @RequestParam(defaultValue = "asc") String sortDirection
-//    ) {
-//
-//        return dataService.search(
-//                minValue,
-//                maxValue,
-//                page,
-//                size,
-//                sortBy,
-//                sortDirection
-//        );
-//    }
-
-    @GetMapping
-    public Page<DataResponse> getData(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Double minValue,
-            @RequestParam(required = false) Double maxValue,
-            @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable
-    ) {
-        return dataService.search(name, minValue, maxValue, pageable);
+    @GetMapping("/sample")
+    public DataResponse sample() {
+        return new DataResponse(0L, "test", 42.0, 1L, "Test_category", java.util.Set.of("urgent", "weather"));
     }
-
-//    @GetMapping
-//    public List<DataResponse> getAll() {
-//        return dataService.getAllData();
-//    }
-
-    @PostMapping("/search")
-    public Page<DataResponse> searchData(
-            @RequestBody DataSearchRequest request,
-            @PageableDefault(
-                    page = 0,
-                    size = 5,
-                    sort = "id",
-                    direction = Sort.Direction.ASC
-            ) Pageable pageable
-    ) {
-        return dataService.search(request, pageable);
-    }
-
-    @GetMapping("/stats")
-    public StatsResponse getStats() {
-        return dataService.getStats();
-    }
-
-    @GetMapping("/{id}")
-    public DataResponse getById(@PathVariable Long id) {
-        return dataService.getById(id);
-    }
-
 }
