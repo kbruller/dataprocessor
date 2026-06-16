@@ -136,53 +136,6 @@ public class DataService {
         dataRepository.delete(entity);
     }
 
-
-
-
-//    @Transactional(readOnly = true)
-//    public List<DataResponse> getByValueBetween(double minValue, double maxValue) {
-//        return dataRepository.findByValueBetween(minValue, maxValue)
-//                .stream()
-//                .map(dataMapper::toResponse)
-//                .toList();
-//    }
-
-//    @Transactional(readOnly = true)
-//    public Page<DataResponse> search(
-//            Double minValue,
-//            Double maxValue,
-//            int page,
-//            int size,
-//            String sortBy,
-//            String sortDirection
-//    ) {
-//        Sort sort = sortDirection.equalsIgnoreCase("desc")
-//                ? Sort.by(sortBy).descending()
-//                : Sort.by(sortBy).ascending();
-//
-//        Pageable pageable = PageRequest.of(page, size, sort);
-//
-//        Page<DataEntity> entities;
-//
-//        if (minValue != null && maxValue != null) {
-//            entities = dataRepository.findByValueBetween(
-//                    minValue,
-//                    maxValue,
-//                    pageable
-//            );
-//        } else if (minValue != null) {
-//            entities = dataRepository.findByValueGreaterThanEqual(
-//                    minValue,
-//                    pageable
-//            );
-//        } else {
-//            entities = dataRepository.findAll(pageable);
-//        }
-//
-//        return entities.map(dataMapper::toResponse);
-//    }
-
-
     @Transactional(readOnly = true)
     public Page<DataResponse> search(
             String name,
