@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DataprocessorApplication {
 
     public static void main(String[] args) {
-        System.out.println("CONFIG TEST");
         SpringApplication.run(DataprocessorApplication.class, args);
     }
 

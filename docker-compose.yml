@@ -1,15 +1,35 @@
 services:
+
   postgres:
     image: postgres:17
     container_name: dataprocessor-postgres
+
     environment:
       POSTGRES_DB: dataprocessor
       POSTGRES_USER: dataprocessor
       POSTGRES_PASSWORD: dataprocessor
+
     ports:
       - "5432:5432"
+
     volumes:
       - dataprocessor-postgres-data:/var/lib/postgresql/data
+
+  app:
+    image: dataprocessor
+    container_name: dataprocessor-app
+
+    depends_on:
+      - postgres
+
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://postgres:5432/dataprocessor
+      DB_USER: dataprocessor
+      DB_PASSWORD: dataprocessor
+
+    ports:
+      - "8080:8080"
 
 volumes:
   dataprocessor-postgres-data:
