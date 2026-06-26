@@ -8,6 +8,7 @@ import com.example.dataprocessor.model.dto.CategoryRequest;
 import com.example.dataprocessor.model.dto.CategoryResponse;
 import com.example.dataprocessor.repository.CategoryRepository;
 import com.example.dataprocessor.repository.DataRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponse createCategory(CategoryRequest request) {
         CategoryEntity entity = categoryMapper.toEntity(request);
         CategoryEntity saved = categoryRepository.save(entity);
@@ -47,6 +49,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("@securityCheck.isOwner(#id) or hasRole('ADMIN')")
     public CategoryResponse getCategoryById(Long id) {
         CategoryEntity entity = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException(id));
@@ -55,6 +58,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public CategoryResponse updateCategory(Long id, CategoryRequest request) {
         CategoryEntity entity = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException(id));
@@ -64,15 +68,8 @@ public class CategoryService {
         return categoryMapper.toResponse(entity);
     }
 
-//    @Transactional
-//    public void deleteCategory(Long id) {
-//        CategoryEntity entity = categoryRepository.findById(id)
-//                .orElseThrow(() -> new CategoryNotFoundException(id));
-//
-//        categoryRepository.delete(entity);
-//    }
-
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and #id >= 10)")
     public void deleteCategory(Long id) {
         CategoryEntity entity = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException(id));
