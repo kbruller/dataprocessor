@@ -3,10 +3,9 @@ package com.example.dataprocessor.config;
 import com.example.dataprocessor.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -49,8 +49,6 @@ public class SecurityConfig {
                                 "/h2-console/**",
                                 "/auth/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/categories")
-                        .hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
@@ -62,8 +60,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration)
-            throws Exception {
+            AuthenticationConfiguration configuration){
 
         return configuration.getAuthenticationManager();
     }

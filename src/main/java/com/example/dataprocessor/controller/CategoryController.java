@@ -5,6 +5,7 @@ import com.example.dataprocessor.model.dto.CategoryResponse;
 import com.example.dataprocessor.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class CategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponse createCategory(
             @Valid @RequestBody CategoryRequest request
     ) {
