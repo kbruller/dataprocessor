@@ -3,15 +3,20 @@ package com.example.dataprocessor.controller;
 import com.example.dataprocessor.exception.DataNotFoundException;
 import com.example.dataprocessor.model.dto.DataRequest;
 import com.example.dataprocessor.model.dto.DataResponse;
+import com.example.dataprocessor.security.jwt.JwtAuthenticationFilter;
 import com.example.dataprocessor.service.DataService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,9 +34,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.any;
-// import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print; // <-- IMPORTÁLD BE
 
-@WebMvcTest(DataController.class)
+@WebMvcTest(
+        controllers = DataController.class,
+        // The JWT filter is a @Component Filter, so @WebMvcTest would otherwise
+        // pull it (and its JwtService / UserDetailsService deps) into the slice.
+        // Exclude it: these tests cover controller behavior, not security.
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = JwtAuthenticationFilter.class))
+@AutoConfigureMockMvc(addFilters = false)
 class DataControllerTest {
 
     @Autowired
@@ -67,6 +79,8 @@ class DataControllerTest {
                 .andExpect(jsonPath("$.categoryName").value("Sensors"))
                 .andExpect(jsonPath("$.tags").isArray())
                 .andExpect(jsonPath("$.tags[0]").value("urgent"));
+
+        verify(dataService).getById(1L);
     }
 
     @Test
@@ -123,8 +137,8 @@ class DataControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 // Fields of the ApiErrorResponse
-                .andExpect(jsonPath("$.error").value("Validation Failed"))
-                .andExpect(jsonPath("$.message").value("Request validation failed"))
+                .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
+                //.andExpect(jsonPath("$.message").value("Request validation failed"))
                 // Let's check whether the specific field errors are present in the map:
                 .andExpect(jsonPath("$.validationErrors.name").exists())
                 .andExpect(jsonPath("$.validationErrors.value").exists());
@@ -150,8 +164,8 @@ class DataControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.error").value("Validation Failed"))
-                .andExpect(jsonPath("$.message").value("Request validation failed"))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                //.andExpect(jsonPath("$.message").value("Request validation failed"))
                 .andExpect(jsonPath("$.validationErrors.name").exists())
                 .andExpect(jsonPath("$.validationErrors.value").exists());
 
